@@ -9,8 +9,8 @@ Open localhost:8081
 
 ## Package using
 1. Mysql
-<dependency>
+[<dependency>
   <groupId>com.mysql</groupId>
   <artifactId>mysql-connector-j</artifactId>
   <scope>runtime</scope>
-</dependency>
+</dependency>]
