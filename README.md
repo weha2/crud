@@ -6,3 +6,11 @@ Step
 1. docker pull phpmyadmin
 2. Run: docker run --name phpmyadmin -d --link mysql-server:db -p 8081:80 phpmyadmin
 Open localhost:8081 
+
+## Package using
+1. Mysql
+<dependency>
+  <groupId>com.mysql</groupId>
+  <artifactId>mysql-connector-j</artifactId>
+  <scope>runtime</scope>
+</dependency>
