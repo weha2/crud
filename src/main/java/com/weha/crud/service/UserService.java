@@ -46,7 +46,7 @@ public class UserService {
 
     public ResponseUserDTO createUser(CreateUserDTO req) {
         UserEntity entity = new UserEntity();
-        entity.setFirstName(req.fistName());
+        entity.setFirstName(req.firstName());
         entity.setLastName(req.lastName());
         return Optional.of(userRepository.save(entity))
                 .map(e ->
@@ -63,7 +63,7 @@ public class UserService {
         Optional<UserEntity> userEntity = userRepository.findById(id);
         if (userEntity.isEmpty()) throw new Exception("Not found user");
         UserEntity user = userEntity.get();
-        user.setFirstName(req.fistName());
+        user.setFirstName(req.firstName());
         user.setLastName(req.lastName());
         user.setModifierDate(LocalDateTime.now());
         return Optional.of(userRepository.save(user))
