@@ -25,8 +25,26 @@ public class UserController {
         return ResponseEntity.ok(userService.findUsers());
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<ResponseUserDTO> findById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(userService.findById(id));
+    }
+
     @PostMapping("")
     public ResponseEntity<ResponseUserDTO> createUser(@RequestBody CreateUserDTO req) {
         return ResponseEntity.ok(userService.createUser(req));
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<ResponseUserDTO> updateUser(
+            @PathVariable Long id,
+            @RequestBody CreateUserDTO req) throws Exception {
+        return ResponseEntity.ok(userService.updateUser(id, req));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Boolean> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok(true);
     }
 }
