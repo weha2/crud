@@ -7,6 +7,7 @@ import com.weha.crud.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,49 +15,33 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final SocialService socialService;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, SocialService socialService) {
         this.userRepository = userRepository;
+        this.socialService = socialService;
     }
 
     public List<ResponseUserDTO> findUsers() {
         return userRepository
                 .findAll()
-                .stream().map(e -> new ResponseUserDTO(
-                        e.getId(),
-                        e.getFirstName(),
-                        e.getLastName(),
-                        e.getCreatedDate()
-                ))
+                .stream().map(e -> entityToUserDTO(e).orElse(null))
                 .toList();
     }
 
     public ResponseUserDTO findById(long id) throws Exception {
         Optional<UserEntity> userEntity = userRepository.findById(id);
         if (userEntity.isEmpty()) throw new Exception("Not found user");
-        return userEntity
-                .map(u -> new ResponseUserDTO(
-                        u.getId(),
-                        u.getFirstName(),
-                        u.getLastName(),
-                        u.getCreatedDate()
-                ))
-                .orElse(null);
+        return entityToUserDTO(userEntity.get()).orElse(null);
     }
 
     public ResponseUserDTO createUser(CreateUserDTO req) {
-        UserEntity entity = new UserEntity();
-        entity.setFirstName(req.firstName());
-        entity.setLastName(req.lastName());
-        return Optional.of(userRepository.save(entity))
-                .map(e ->
-                        new ResponseUserDTO(
-                                e.getId(),
-                                e.getFirstName(),
-                                e.getLastName(),
-                                e.getCreatedDate()
-                        )
-                ).orElse(null);
+        UserEntity user = new UserEntity();
+        user.setFirstName(req.firstName());
+        user.setLastName(req.lastName());
+        UserEntity userEntity = userRepository.save(user);
+        socialService.createSocial(userEntity, req.social());
+        return entityToUserDTO(userEntity).orElse(null);
     }
 
     public ResponseUserDTO updateUser(long id, CreateUserDTO req) throws Exception {
@@ -66,17 +51,24 @@ public class UserService {
         user.setFirstName(req.firstName());
         user.setLastName(req.lastName());
         user.setModifierDate(LocalDateTime.now());
-        return Optional.of(userRepository.save(user))
-                .map(u -> new ResponseUserDTO(
-                        u.getId(),
-                        u.getFirstName(),
-                        u.getLastName(),
-                        u.getCreatedDate()
-                ))
-                .orElse(null);
+        UserEntity updated = userRepository.save(user);
+        socialService.updateSocial(updated.getSocial().getId(), updated, req.social());
+        return entityToUserDTO(updated).orElse(null);
     }
 
     public void deleteUser(long id) {
         userRepository.deleteById(id);
+    }
+
+    private Optional<ResponseUserDTO> entityToUserDTO(UserEntity entity) {
+        return Optional.of(entity)
+                .map(u -> new ResponseUserDTO(
+                        u.getId(),
+                        u.getFirstName(),
+                        u.getLastName(),
+                        u.getCreatedDate(),
+                        socialService.findByUser(u),
+                        new ArrayList<>()
+                ));
     }
 }

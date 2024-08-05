@@ -2,15 +2,15 @@ package com.weha.crud.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 
-@Setter
-@Getter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @Entity
 @Table(name = "users")
 public class UserEntity extends BaseEntity {
@@ -21,5 +21,11 @@ public class UserEntity extends BaseEntity {
 
     @Column
     private String lastName;
+
+    @OneToOne(mappedBy = "user", orphanRemoval = true)
+    private SocialEntity social;
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<AddressEntity> addresses;
 
 }
