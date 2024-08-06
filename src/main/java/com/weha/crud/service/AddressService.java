@@ -25,7 +25,7 @@ public class AddressService {
         if (entities.isPresent()) {
             for (AddressEntity address : entities.get()) {
                 addresses.add(new AddressDTO(
-                        0,
+                        address.getId(),
                         address.getLine1(),
                         address.getLine2(),
                         address.getZipCode()));
@@ -34,17 +34,21 @@ public class AddressService {
         return addresses;
     }
 
-    public void createAddress(UserEntity user, List<AddressDTO> addresses) {
-        List<AddressEntity> data = new ArrayList<>();
+    public void updateAddress(UserEntity user, List<AddressDTO> addresses) {
         if (addresses != null) {
+            List<AddressEntity> data = new ArrayList<>();
             for (AddressDTO dto : addresses) {
                 AddressEntity address = new AddressEntity();
+                if (dto.id() != 0) {
+                    address.setId((dto.id()));
+                }
                 address.setUser(user);
                 address.setLine1(dto.line1());
                 address.setLine2(dto.line2());
                 address.setZipCode(dto.zipCode());
+                data.add(address);
             }
+            addressRepository.saveAll(data);
         }
-        addressRepository.saveAll(data);
     }
 }
